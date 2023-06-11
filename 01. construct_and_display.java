@@ -1,59 +1,122 @@
 import java.util.*;
 
 public class Main {
+
     public static class Node {
         int data;
-        ArrayList<Node>children = new ArrayList<>();
+        Node left;
+        Node right;
+
+        Node() {
+
+        }
+
+        Node(int data) {
+            this.data = data;
+        }
     }
-    
-    public static Node construct(int[]data) {
-        Stack<Node>st = new Stack<>();
-        Node root = null;
-        
-        for(int i=0;i < data.length;i++) {
-            if(data[i] == -1) {
+
+    public static class Pair {
+        Node node;
+        int state;
+
+        Pair() {
+
+        }
+
+        Pair(Node node,int state) {
+            this.node = node;
+            this.state = state;
+        }
+    }
+
+    public static Node construct(Integer[]data) {
+        Stack<Pair>st = new Stack<>();
+
+        Node root = new Node(data[0]);
+
+        Pair root_pair = new Pair(root,0);
+        st.push(root_pair);
+
+        int idx = 1;
+
+        while(st.size() > 0) {
+            Pair top = st.peek();
+
+            if(top.state == 0) {
+                //left child
+                top.state++;
+
+                if(data[idx] != null) {
+                    Node lc = new Node(data[idx]);
+                    top.node.left = lc;
+
+                    Pair lcp = new Pair(lc,0);
+                    st.push(lcp);
+                }
+                idx++;
+
+            }
+            else if(top.state == 1) {
+                //right child
+                top.state++;
+
+                if(data[idx] != null) {
+                    Node rc = new Node(data[idx]);
+                    top.node.right = rc;
+
+                    Pair rcp = new Pair(rc,0);
+                    st.push(rcp);
+                }
+                idx++;
+            }
+            else if(top.state == 2) {
                 st.pop();
             }
-            else {
-                Node n = new Node();
-                n.data = data[i];
-                
-                if(st.size() == 0) {
-                    root = n;
-                }
-                else {
-                    st.peek().children.add(n);
-                }
-                
-                st.push(n);
-                
-            }
         }
-        
+
+
         return root;
     }
-    
-    public static void display(Node root) {
-        System.out.print(root.data + "->");
-        
-        //print root's children
-        for(int i=0; i < root.children.size();i++) {
-            Node child = root.children.get(i);
-            System.out.print(child.data + ",");
+
+    public static void display(Node node) {
+        if(node == null) {
+            return;
         }
-        System.out.println(".");
-        
-         for(int i=0; i < root.children.size();i++) {
-            Node child = root.children.get(i);
-            display(child);
-        }
-        
+
+        String str = " <- " + node.data + " -> ";
+
+        String left = (node.left != null) ? ("" + node.left.data) : ".";
+        String right = (node.right != null) ? ("" + node.right.data) : ".";
+
+        str = left + str + right;
+
+        System.out.println(str);
+
+        display(node.left);
+        display(node.right);
     }
-    
+
+    public static void traversal(Node node) {
+        if(node == null) {
+            return ;
+        }
+
+        System.out.println(node.data + " pre");
+
+        traversal(node.left);
+        System.out.println(node.data + " in");
+        traversal(node.right);
+
+        System.out.println(node.data + " post");
+    }
+
     public static void main(String[]args) {
-        int[]arr = {10,20,50,-1,60,-1,-1,30,70,-1,80,110,-1,120,-1,-1,90,-1,-1,40,100,-1,-1,-1};
-        Node root=construct(arr);
-        // System.out.println(root.data + " " + root.children.size());
-        display(root); 
+       Integer[]arr = {50,25,12,null,null,37,30,null,null,null,75,62,null,70,null,null,87,null,null};
+
+       Node root = construct(arr);
+
+    //    display(root);
+        traversal(root);
     }
 }
